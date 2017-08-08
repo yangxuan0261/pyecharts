@@ -1,16 +1,21 @@
 # pyecharts Documentation
 
-* [Overview](https://github.com/chenjiandongx/pyecharts/blob/master/document/doc_en_US.md#Overview)
-* [Installing](https://github.com/chenjiandongx/pyecharts/blob/master/document/doc_en_US.md#Installing)
+pyecharts is a library to generate charts using Echarts. It simply provides the interface between Echarts and Python.
+
+[![Build Status](https://travis-ci.org/chenjiandongx/pyecharts.svg?branch=master)](https://travis-ci.org/chenjiandongx/pyecharts)  
+
 * [First-steps](https://github.com/chenjiandongx/pyecharts/blob/master/document/doc_en_US.md#First-steps)
 * [Global-options](https://github.com/chenjiandongx/pyecharts/blob/master/document/doc_en_US.md#Global-options)
     * xyAxis：x, y axis in cartesian coordinate system(Line、Bar、Scatter、EffectScatter、Kline)
     * dataZoom：dataZoom components for zoom-in and zoom-out. With them, it is possible to magnify a small area, to see the overall picture or to stay away from scattered points(Line、Bar、Scatter、EffectScatter、Kline)
-    * legend：legend component has different symbol, colour and name,  and provide the interactive clicking functions to show or hide its associated data series.
+    * legend：legend component has different symbol, colour and name, and provide the interactive clicking functions to show or hide its associated data series.
     * label：text string on the chart, for marking the charts with sensible details, such as value, name.
     * lineStyle：line style for Line、Polar、Radar、Graph、Parallel.
+    * grid3D：gird3D components in cartesian coordinate system(Bar3D, Line3D, Scatter3D)
+    * visualMap：It is a type of component for visual encoding, which maps the data to visual channels
 * [Chart-types](https://github.com/chenjiandongx/pyecharts/blob/master/document/doc_en_US.md#Chart-types)
     * Bar
+    * Bar3D
     * EffectScatter
     * Funnel
     * Gauge
@@ -19,6 +24,7 @@
     * HeatMap
     * Kline
     * Line
+    * Line3D
     * Liquid
     * Map
     * Parallel
@@ -26,27 +32,15 @@
     * Polar
     * Radar
     * Scatter
+    * Scatter3D
     * WordCloud
 * [Customize](https://github.com/chenjiandongx/pyecharts/blob/master/document/doc_en_US.md#Customize)
 * [Example](https://github.com/chenjiandongx/pyecharts/blob/master/document/doc_en_US.md#Example)
 * [About](https://github.com/chenjiandongx/pyecharts/blob/master/document/doc_en_US.md#About)
 
 
-# Overview  
-pyecharts is a library to generate charts using Echarts. It simply provides the interface between Echarts and Python. 
-
-[Echarts](https://github.com/ecomfe/echarts) is an open source library from Baidu for data visualization in javascript. It has awesome demo pages so I started to look out for an
-interface library so that I could use it in Python. I ended up with [echarts-python](https://github.com/yufeiminds/echarts-python) on github but it lacks of documentation and was not updated for a while. Just like many other Python projects, I started my own project, pyecharts, referencing echarts-python and another library [pygal](https://github.com/Kozea/pygal). 
-
-
-# Installing
-pyecharts works on Python2 and Python3. The latest release is 0.1.9.1. For more information please refer to [changelog.md](https://github.com/chenjiandongx/pyecharts/blob/master/changelog.md)
-
-```python
-pip install pyecharts
-```
-
 # First-steps
+### Make sure you have installed the latest version pyecharts
 Now, you are ready to make your first chart!
 ```python
 from pyecharts import Bar
@@ -58,71 +52,128 @@ bar.render()
 ```
 ![guide-0](https://github.com/chenjiandongx/pyecharts/blob/master/images/guide-0.png)
 
-**Tip：** 可以按右边的下载按钮将图片下载到本地  
+**Tip：** You can click the download button on the right side to download the picture to your local disk.
 
-* ```add()```  
-    主要方法，用于添加图表的数据和设置各种配置项  
-* ```show_config()```  
-    打印输出图表的所有配置项
-* ```render()```  
-    默认将会在根目录下生成一个 render.html 的文件，支持 path 参数，设置文件保存位置，如 render(r"e:\my_first_chart.html")，文件用浏览器打开。  
-    默认的编码类型为 UTF-8，在 Python3 中是没什么问题的，Python3 对中文的支持好很多。但是在 Python2 中，编码的处理是个很头疼的问题，暂时没能找到完美的解决方法，目前只能通过文本编辑器自己进行二次编码，我用的是 Visual Studio Code，先通过 Gbk 编码重新打开，然后再用 UTF-8 重新保存，这样用浏览器打开的话就不会出现中文乱码问题了。  
+* ```add()```
+    main method，add the data and set up various options of the chart
+* ```show_config()```
+    print and output all options of the chart
+* ```render()```
+    creat a file named render.html in the root directory defaultly,which supports path parameter and set the location the file save in,for instance render(r"e:\my_first_chart.html")，open file with your browser.
 
-基本上所有的图表类型都是这样绘制的：
-1. ```chart_name = Type()``` 初始化具体类型图表。
-2. ```add()``` 添加数据及配置项。
-3. ```render()``` 生成 .html 文件。  
+### Python2 Coding Problem
+default code type is UTF-8, there's no problem in Python3, because Python3 have a good support in chinese. But in Python2, please use the following sentence to ensure avoiding wrong coding problem:
+```
+#!/usr/bin/python
+#coding=utf-8
+from __future__ import unicode_literals
+```
+The first two sentences are telling your editor that it should use UTF-8 ([PEP-0263](https://www.python.org/dev/peps/pep-0263/)). And the last sentence is telling Python all the characters are UTF-8 ([unicode literals](http://python-future.org/unicode_literals.html))
 
-```add()``` 数据一般为两个列表（长度一致），如果你的数据是字典或者是带元组的字典。可利用 ```cast()``` 方法转换。
+
+almost all the chart type drawed like this:
+1. ```chart_name = Type()``` Initialise the concrete chart type.
+2. ```add()``` Add data and options.
+3. ```render()``` Creat .html file.
+
+```add()``` Data is two lists commonly(the same length),if your data is dictionary or dictionary with tuple,use ```cast()``` to convert.
 
 ```python
 @staticmethod
 cast(seq)
-``` Convert the sequence with the dictionary and tuple type into k_lst, v_lst. ``` 
+``` Convert the sequence with the dictionary and tuple type into k_lst, v_lst. ```
 ```
-1. 元组列表  
+1. Tuple Lists
     [(A1, B1), (A2, B2), (A3, B3), (A4, B4)] --> k_lst[ A[i1, i2...] ], v_lst[ B[i1, i2...] ]
-2. 字典列表  
+2. Dictionary Lists
     [{A1: B1}, {A2: B2}, {A3: B3}, {A4: B4}] --> k_lst[ A[i1, i2...] ], v_lst[ B[i1, i2...] ]
-3. 字典  
+3. Dictionaries
     {A1: B1, A2: B2, A3: B3, A4: B4} -- > k_lst[ A[i1, i2...] ], v_lst[ B[i1, i2...] ]
 
-**当然你也可以采用更加酷炫的方式，使用 Jupyter Notebook 来展示图表，matplotlib 有的，pyecharts 也会有的**  
+In the context of Numpy and/or Pandas, ```pdcast(pddata)``` and ``` npcast(npdata)``` methods, provided in 0.19.2 are no log required. Please see the advanced example in README.
 
-比如这样  
+If your DataFrame returns a transposed list(such as, [ [1], [2], [3] ]), you have to tranpose it by yourself (make it like [ 1, 2, 3 ] ). This transpose operation applies to Radar, Parallel, HeatMap.
 
-![jupyter-0](https://github.com/chenjiandongx/pyecharts/blob/master/images/jupyter-0.gif)
+Series type
+```python
+from pyecharts import Bar
+import pandas as pd
 
-还有这样
+pddata = pd.Series([1, 2, 3, 4], index=[1, 'b', 'c', 'd'])
+vlst, ilst = Bar.pdcast(pddata)
 
-![jupyter-1](https://github.com/chenjiandongx/pyecharts/blob/master/images/jupyter-1.gif)
+print(vlst)
+>>> [1.0, 2.0, 3.0, 4.0] 
+print(ilst)
+>>> ['1', 'b', 'c', 'd']
+```
 
-![jupyter-2](https://github.com/chenjiandongx/pyecharts/blob/master/images/jupyter-2.gif)
+DataFrame type
+```python
+from pyecharts import Bar
+import pandas as pd
 
-**Tip：** 该功能在 0.1.8 版本中正式加入，要使用请升级到最新版本。
+pddt = pd.DataFrame([[1, 2, 3, 4], [2, 3, 4, 5], [4.1, 5.2, 6.3, 7.4]], index=["A", "B", "C"])
+vlst, ilst = Bar.pdcast(pddata)
 
-这里只是举几个例子。如需使用 Jupyter Notebook 来展示图表，只需要调用 ```render_notebook()``` 即可，同时兼容 Python2 和 Python3 的 Jupyter Notebook 环境。所有图表均可正常显示，与浏览器一致的交互体验，这下展示报告连 PPT 都省了！！  
-> 在这里要特别感谢 [@ygw365](https://github.com/ygw365) 提供这部分的代码模板 和 [muxuezi](https://github.com/muxuezi) 协助对代码进行改进，特此感谢！也欢迎其他开发者参与到项目的开发中来。一起完善这个项目！
+print(vlst)
+>>> [[1.0, 2.0, 3.0, 4.0], [2.0, 3.0, 4.0, 5.0], [4.1, 5.2, 6.3, 7.4]]
+print(ilst)
+>>> ['A', 'B', 'C']
+```
 
-图表类初始化所接受的参数（所有类型的图表都一样）。
+npcast()，It accepts numpy.array type.
+```python
+@staticmethod
+npcast(npdata)
+``` handle the ndarray type in Numpy, return a list that ensures the correct type. Returns the nested list if there are multiple dimensions.```
+```
 
-* title -> str   
-    default -> ''    
+Numpy.array type
+```python
+from pyecharts import Bar
+import numpy ad np
+
+npdata = np.array([[1, 2, 3, 4], [2, 4, 5.0, 6.3]])
+print(npdata)
+>>> [[1.0, 2.0, 3.0, 4.0], [2.0, 4.0, 5.0, 6.3]]
+```
+
+**Of course you can use the cooler way,use Jupyter Notebook to show the chart.But what matplotlib have，so do pyecharts**
+
+like this
+
+![notebook-0](https://github.com/chenjiandongx/pyecharts/blob/master/images/notebook-0.gif)
+
+and this
+
+![notebook-1](https://github.com/chenjiandongx/pyecharts/blob/master/images/notebook-1.gif)
+
+more Jupyter notebook examples, please refer to [notebook-use-cases](https://github.com/chenjiandongx/pyecharts/blob/master/document/notebook-use-cases.ipynb)。you could download and run it on your notebook.
+
+**Tip：** The function was official added in 0.1.9.2 version,please update the newest version to use it.
+
+If you want use Jupyter Notebook to show your chart,just call Chart instance,compatible with Python2 and Python3's Jupyter Notebook environment at sametime.All the chart can display normaly,the same interaction experience to browser,there's no need to make a complex powerpoint!!
+
+The parameter a chart type initialize accept（the same to all the chart type）.
+
+* title -> str  
+    default -> ''  
     The main title text, supporting for \n for newlines.
 * subtitle -> str  
     defalut -> ''  
     Subtitle text, supporting for \n for newlines.
 * width -> int  
-    defalut -> 800(px)    
-    Canvas width  
+    defalut -> 800(px)  
+    Canvas width
 * height -> int  
-    defalut -> 400(px) 
+    defalut -> 400(px)  
     Canvas height
 * title_pos -> str/int  
     defalut => 'left'  
     Distance between grid component and the left side of the container.title_pos value can be instant pixel value like 20;  
     it can also be percentage value relative to container width like '20%';it can also be 'left', 'center', or 'right'.  
-    If the title_pos value is set to be 'left', 'center', or 'right',then the component will be aligned automatically based on position.  
+    If the title_pos value is set to be 'left', 'center', or 'right',then the component will be aligned automatically based on position.
 * title_top -> str/int  
     default -> 'top'  
     Distance between grid component and the top side of the container.top value can be instant pixel value like 20;  
@@ -136,23 +187,23 @@ cast(seq)
     subtitle text color.
 * title_text_size -> int  
     defalut -> 18  
-    main title font size  
+    main title font size
 * subtitle_text_size -> int  
     defalut -> 12  
-    subtitle text color.  
+    subtitle text color.
 * background_color -> str  
     defalut -> '#fff'  
     Background color of title, which is transparent by default.  
-    Color can be represented in RGB, for example 'rgb(128, 128, 128)'.RGBA can be used when you need alpha channel, for example 'rgba(128, 128, 128, 0.5)'.  
-    You may also use hexadecimal format, for example '#ccc'.  
+    Color can be represented in RGB, for example 'rgb(128, 128, 128)'.RGBA can be used when you need alpha channel, for example 'rgba(128, 128, 128, 0.5)'.
+    You may also use hexadecimal format, for example '#ccc'.
 * is_grid -> bool  
     defalut -> False  
     It specifies whether to use the grid component. Detail [Customize](https://github.com/chenjiandongx/pyecharts/blob/master/document/doc_en_US.md#Customize)
 
 # Global-options
-**通用配置项均在 ```add()``` 中设置**
+**Sitting general configuration in```add()```**
 
-xyAxis：直角坐标系中的 x、y 轴(Line、Bar、Scatter、EffectScatter、Kline)
+xyAxis：x, y axis in cartesian coordinate system(Line、Bar、Scatter、EffectScatter、Kline)
 
 * is_convert -> bool  
     It specifies whether to convert xAxis and yAxis.
@@ -166,64 +217,77 @@ xyAxis：直角坐标系中的 x、y 轴(Line、Bar、Scatter、EffectScatter、
     Name of xAxis
 * xaxis_name_pos -> str  
     Location of xAxis name.It can be 'start'，'middle'，'end'
+* xaxis_rotate -> int  
+    Rotation degree of xaxis label, which is especially useful when there is no enough space for category axis.Rotation degree is from -90 to 90.
+* xaxis_min -> int/float  
+    The minimun value of xaxis.
+* xaxis_max -> int/float  
+    The maximun value of xaxis.
 * y_axis -> list  
     yAxis data
 * yaxis_formatter -> str  
-    Formatter of axis label, which supports string template and callback function.  
-    example: '{value} kg'
+    Formatter of axis label, which supports string template and callback function.example: '{value} kg'
 * yaxis_name -> str  
     Name of yAxis
 * yaxis_name_pos -> str  
     Location of yAxis name.It can be 'start'，'middle'，'end'
+* yaxis_rotate -> int  
+    Rotation degree of xaxis label, which is especially useful when there is no enough space for category axis.Rotation degree is from -90 to 90.
+* yaxis_min -> int/float  
+    The minimun value of yaxis.
+* yaxis_max -> int/float  
+    The maximun value of yaxis.
 * interval -> int  
-    The display interval of the axis scale label is valid in the category axis.  
-    By default, labels are displayed using labels that do not overlap the labels.  
+    The display interval of the axis scale label is valid in the category axis.By default, labels are displayed using labels that do not overlap the labels.  
     Set to 0 to force all labels to be displayed and label is one by one if setting as 1; If 2, it will be one label separates from each other, and so on.
 
 
-dataZoom：dataZoom 组件 用于区域缩放，从而能自由关注细节的数据信息，或者概览数据整体，或者去除离群点的影响。(Line、Bar、Scatter、EffectScatter、Kline)
+dataZoom：dataZoom components for zoom-in and zoom-out. With them, it is possible to magnify a small area, to see the overall picture or to stay away from scattered points(Line、Bar、Scatter、EffectScatter、Kline)
 
 * is_datazoom_show -> bool  
     defalut -> False  
     It specifies whether to use the datazoom component.
 * datazoom_type -> str  
     defalut -> 'slider'  
-    datazoom type, 'slider' or 'inside'  
+    datazoom type, 'slider' or 'inside'
 * datazoom_range -> list  
     defalut -> [50, 100]  
     The range percentage of the window out of the data extent, in the range of 0 ~ 100.
+* datazoom_orient -> str  
+    Specify whether the layout of dataZoom component is horizontal or vertical.'horizontal' or 'vertical'  
+    What's more,it indicates whether the horizontal axis or vertical axis is controlled,by default in catesian coordinate system.
 
 
-legend：图例组件。图例组件展现了不同系列的标记(symbol)，颜色和名字。可以通过点击图例控制哪些系列不显示。
+legend：legend component has different symbol, colour and name, and provide the interactive clicking functions to show or hide its associated data series.
 
 * is_legend_show -> bool  
     defalut -> True  
-    It specifies whether to show the legend component.  
+    It specifies whether to show the legend component.
 * legend_orient -> str  
     defalut -> 'horizontal'  
-    The layout orientation of legend.It can be 'horizontal', 'vertical'  
+    The layout orientation of legend.It can be 'horizontal', 'vertical'
 * legend_pos -> str  
     defalut -> 'center'  
     Distance between legend component and the left side of the container.  
-    legend_pos value can be instant pixel value like 20;  
-    it can also be percentage value relative to container width like '20%';  
-    and it can also be 'left', 'center', or 'right'.  
+    legend_pos value can be instant pixel value like 20;it can also be percentage value relative to container width like '20%';
+    and it can also be 'left', 'center', or 'right'.
 * legend_top -> str  
     defalut -> 'top'  
     Distance between legend component and the top side of the container.  
-    legend_top value can be instant pixel value like 20;  
-    it can also be percentage value relative to container width like '20%';  
-    and it can also be 'top', 'middle', or 'bottom'.  
-    
+    legend_top value can be instant pixel value like 20;it can also be percentage value relative to container width like '20%';
+    and it can also be 'top', 'middle', or 'bottom'.
+* legend_selectedmode -> str/bool  
+    State table of selected legend. 'single' or 'multiple'.or use False to disable it.
 
-label：图形上的文本标签，可用于说明图形的一些数据信息，比如值，名称等。
+
+label：text string on the chart, for marking the charts with sensible details, such as value, name.
 
 * is_label_show -> bool  
-    defalut -> False  
-    It specifies whether to show laebl in normal status.  
+    defalut -> False
+    It specifies whether to show laebl in normal status.
 * is_emphasis -> bool  
-    defalut ->
-    It specifies whether to show laebl in emphasis status.  
+    defalut -> False  
+    It specifies whether to show laebl in emphasis status.
 * label_pos -> str  
     defalut -> 'top'  
     Label position.It can be 'top', 'left', 'right', 'bottom', 'inside','outside'
@@ -239,27 +303,75 @@ label：图形上的文本标签，可用于说明图形的一些数据信息，
 * label_color -> list  
     Customize the label color. It will modify Global color list, and all chart legend colors can be config here. Such as Bar's columnar color, Line's line color, and so on.
 * formatter -> list  
-    Data label formatter,it can be 'series', 'name', 'value', 'precent'  
+    Data label formatter,it can be 'series', 'name', 'value', 'precent'
 
-**Tip：** is_random 可随机打乱图例颜色列表，算是切换风格？建议试一试！
+**Tip：** is_random random disorganize legend colour and list,it's kind of switch style? try it.
 
 
-lineStyle：带线图形的线的风格选项(Line、Polar、Radar、Graph、Parallel)
+lineStyle：line style for Line、Polar、Radar、Graph、Parallel.
 
 * line_width -> int  
-    default -> 1  
-    Line width.  
+    default -> 1
+    Line width.
 * line_opacity -> float  
     default -> 1  
-    Opacity of the component. Supports value from 0 to 1, and the component will not be drawn when set to 0.  
+    Opacity of the component. Supports value from 0 to 1, and the component will not be drawn when set to 0.
 * line_curve -> float  
-    default -> 0 
-    Edge curvature, which supports value from 0 to 1. The larger the value, the greater the curvature. -> Graph  
+    default -> 0  
+    Edge curvature, which supports value from 0 to 1. The larger the value, the greater the curvature. -> Graph
 * line_type -> str  
-    Line type,it can be 'solid', 'dashed', 'dotted'  
+    Line type,it can be 'solid', 'dashed', 'dotted'
+
+grid3D：gird3D components in cartesian coordinate system(Bar3D, Line3D, Scatter3D)
+
+* grid_width -> int  
+    Width of grid component. Adaptive by default.
+* grid_height -> int  
+    Height of grid component. Adaptive by default.
+* grid_top -> int/str  
+    Distance between grid component and the top side of the container.  
+    grid_top value can be instant pixel value like 20;it can also be percentage value relative to container width like '20%';and it can also be 'top', 'middle', or 'bottom'.  
+    If the grid_top value is set to be 'top', 'middle', or 'bottom',then the component will be aligned automatically based on position.
+* grid_bottom -> int/str  
+    Distance between grid component and the bottom side of the container.  
+    grid_bottom value can be instant pixel value like 20;it can also be percentage value relative to container width like '20%'.
+* grid_left -> int/str  
+    Distance between grid component and the left side of the container.  
+    grid_left value can be instant pixel value like 20;it can also be percentage value relative to container width like '20%';and it can also be 'left', 'center', or 'right'.  
+    If the grid_left value is set to be 'left', 'center', or 'right',then the component will be aligned automatically based on position.
+* grid_right -> int/str  
+    Distance between grid component and the right side of the container.  
+    grid_right value can be instant pixel value like 20;it can also be percentage value relative to container width like '20%'.
+
+visualMap：It is a type of component for visual encoding, which maps the data to visual channels.
+
+* visual_type -> str  
+    visual map type, 'color' or 'size'  
+    color: For visual channel color, array is used, like: ['#333', '#78ab23', 'blue'],which means a color ribbon is formed based on the three color stops,and dataValues will be mapped to the ribbon.  
+    size: For visual channel size, array is used, like: [20, 50],which means a size ribbon is formed based on the two value stops, and dataValues will be mapped to the ribbon.
+* visual_range -> list  
+    pecify the min and max dataValue for the visualMap component.
+* visual_text_color -> str  
+    visualMap text color.
+* visual_range_text -> list  
+    The label text on both ends, such as ['High', 'Low']
+* visual_range_size -> list  
+    For visual channel size, array is used, like: [20, 50].
+* visual_range_color -> list  
+    For visual channel color, array is used, like: ['#333', '#78ab23', 'blue'].
+* visual_orient -> str  
+    How to layout the visualMap component, 'horizontal' or 'vertical'.
+* visual_pos -> str  
+    Distance between visualMap component and the left side of the container.  
+    visual_pos value can be instant pixel value like 20;it can also be percentage value relative to container width like '20%';and it can also be 'left', 'center', or 'right'.
+* visual_top -> str  
+    Distance between visualMap component and the top side of the container.  
+    visual_top value can be instant pixel value like 20;it can also be percentage value relative to container width like '20%';and it can also be 'top', 'middle', or 'bottom'.
+* is_calculable -> bool  
+    Whether show handles, which can be dragged to adjust "selected range".
 
 
-# Chart-types  
+# Chart-types
 
 ## Bar
 > Bar chart shows different data through the height of a bar,which is used in rectangular coordinate with at least 1 category axis.
@@ -269,11 +381,11 @@ Bar.add() signatures
 add(name, x_axis, y_axis, is_stack=False, **kwargs)
 ```
 * name -> str  
-    Series name used for displaying in tooltip and filtering with legend,or updaing data and configuration with setOption.  
+    Series name used for displaying in tooltip and filtering with legend,or updaing data and configuration with setOption.
 * x_axis -> list  
-    data of xAixs  
+    data of xAixs
 * y_axis -> list  
-    data of yAxis    
+    data of yAxis
 * is_stack -> bool  
     defalut -> False  
     It specifies whether to stack category axis.
@@ -289,8 +401,8 @@ bar.add("商家A", attr, v1, is_stack=True)
 bar.add("商家B", attr, v2, is_stack=True)
 bar.render()
 ```
-![bar-0](https://github.com/chenjiandongx/pyecharts/blob/master/images/bar-0.gif)  
-**Tip：** 全局配置项要在最后一个 ```add()``` 上设置，否侧设置会被冲刷掉。
+![bar-0](https://github.com/chenjiandongx/pyecharts/blob/master/images/bar-0.gif)
+**Tip：**  Global configuration item needs set in the last ```add()``` or the setting will lose efficacy.
 
 ```python
 from pyecharts import Bar
@@ -302,18 +414,18 @@ bar.render()
 ```
 ![bar-1](https://github.com/chenjiandongx/pyecharts/blob/master/images/bar-1.gif)
 
-* mark_point  -> list  
+* mark_point -> list  
     mark point data, it can be 'min', 'max', 'average'
 * mark_line  -> list  
     mark line data, it can be 'min', 'max', 'average'
 * mark_point_symbol -> str  
-    default -> pin  
+    default -> 'pin'  
     mark symbol, it cna be 'circle', 'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'
 * mark_point_symbolsize -> int  
     default -> 50  
     mark symbol size
 * mark_point_textcolor -> str  
-    default -> '#fff'
+    default -> '#fff'  
     mark point text color
 
 ```python
@@ -326,7 +438,7 @@ bar.render()
 ```
 ![bar-2](https://github.com/chenjiandongx/pyecharts/blob/master/images/bar-2.png)
 
-dataZoom 效果，'slider' 类型
+dataZoom effect，'slider' type
 ```python
 import random
 
@@ -339,7 +451,7 @@ bar.render()
 ```
 ![bar-4](https://github.com/chenjiandongx/pyecharts/blob/master/images/bar-4.gif)
 
-'inside' 类型
+'inside' type
 ```python
 attr = ["{}天".format(i) for i in range(30)]
 v1 = [random.randint(1, 30) for _ in range(30)]
@@ -348,10 +460,105 @@ bar.add("", attr, v1, is_datazoom_show=True, datazoom_type='inside', datazoom_ra
 bar.show_config()
 bar.render()
 ```
-![bar-5](https://github.com/chenjiandongx/pyecharts/blob/master/images/bar-5.gif)  
+![bar-5](https://github.com/chenjiandongx/pyecharts/blob/master/images/bar-5.gif)
 
-**Tip：** datazoom 适合所有平面直角坐标系图形，也就是(Line、Bar、Scatter、EffectScatter、Kline)  
-**Tip：** 可以通过 label_color 来设置柱状的颜色，如 ['#eee', '#000']，所有的图表类型的图例颜色都可通过 label_color 来修改。
+**Tip：** Datazoom fits all plane rectangular coordinate system figure,that's(Line、Bar、Scatter、EffectScatter、Kline)
+**Tip：** Through label_color to set column's colour,like ['#eee', '#000']，any type of chart's legend colour can revise by label_color .
+
+
+## Bar3D
+Bar3D.add() signatures
+```
+add(name, x_axis, y_axis, data, grid3D_opacity=1, grid3D_shading='color', **kwargs)
+```
+* name -> str  
+    Series name used for displaying in tooltip and filtering with legend,or updaing data and configuration with setOption.
+* x_axis -> list  
+    xAxis data
+* y_axis -> list  
+    yAxis data
+* data -> [[], []]
+    zAxis data, it is represented by a two-dimension array.
+* grid3D_opacity -> float  
+    default -> 1  
+    opacity of gird3D item
+* grid3D_shading -> str  
+    3D graphics coloring effect  
+    * 'color': Only show color, not affected by lighting and other factors.
+    * 'lambert': Through the classic lambert coloring to show the light and shade.
+    * 'realistic': Realistic rendering.
+
+```python
+from pyecharts import Bar3D
+
+bar3d = Bar3D("3D 柱状图示例", width=1200, height=600)
+x_axis = ["12a", "1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a",
+          "12p", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p"]
+y_aixs = ["Saturday", "Friday", "Thursday", "Wednesday", "Tuesday", "Monday", "Sunday"]
+data = [[0, 0, 5], [0, 1, 1], [0, 2, 0], [0, 3, 0], [0, 4, 0], [0, 5, 0], [0, 6, 0], [0, 7, 0],
+        [0, 8, 0],[0, 9, 0], [0, 10, 0], [0, 11, 2], [0, 12, 4], [0, 13, 1], [0, 14, 1], [0, 15, 3],
+        [0, 16, 4], [0, 17, 6], [0, 18, 4], [0, 19, 4], [0, 20, 3], [0, 21, 3], [0, 22, 2], [0, 23, 5],
+        [1, 0, 7], [1, 1, 0], [1, 2, 0], [1, 3, 0], [1, 4, 0], [1, 5, 0], [1, 6, 0], [1, 7, 0], [1, 8, 0],
+        [1, 9, 0], [1, 10, 5], [1, 11, 2], [1, 12, 2], [1, 13, 6], [1, 14, 9], [1, 15, 11], [1, 16, 6], [1, 17, 7],
+        [1, 18, 8], [1, 19, 12], [1, 20, 5], [1, 21, 5], [1, 22, 7], [1, 23, 2], [2, 0, 1], [2, 1, 1],
+        [2, 2, 0], [2, 3, 0], [2, 4, 0], [2, 5, 0], [2, 6, 0], [2, 7, 0], [2, 8, 0], [2, 9, 0], [2, 10, 3],
+        [2, 11, 2], [2, 12, 1], [2, 13, 9], [2, 14, 8], [2, 15, 10], [2, 16, 6], [2, 17, 5], [2, 18, 5],
+        [2, 19, 5], [2, 20, 7], [2, 21, 4], [2, 22, 2], [2, 23, 4], [3, 0, 7], [3, 1, 3], [3, 2, 0], [3, 3, 0],
+        [3, 4, 0], [3, 5, 0], [3, 6, 0], [3, 7, 0], [3, 8, 1], [3, 9, 0], [3, 10, 5], [3, 11, 4], [3, 12, 7],
+        [3, 13, 14], [3, 14, 13], [3, 15, 12], [3, 16, 9], [3, 17, 5], [3, 18, 5], [3, 19, 10], [3, 20, 6],
+        [3, 21, 4], [3, 22, 4], [3, 23, 1], [4, 0, 1], [4, 1, 3], [4, 2, 0], [4, 3, 0], [4, 4, 0], [4, 5, 1],
+        [4, 6, 0], [4, 7, 0], [4, 8, 0], [4, 9, 2], [4, 10, 4], [4, 11, 4], [4, 12, 2], [4, 13, 4], [4, 14, 4],
+        [4, 15, 14], [4, 16, 12], [4, 17, 1], [4, 18, 8], [4, 19, 5], [4, 20, 3], [4, 21, 7], [4, 22, 3],
+        [4, 23, 0], [5, 0, 2], [5, 1, 1], [5, 2, 0], [5, 3, 3], [5, 4, 0], [5, 5, 0], [5, 6, 0], [5, 7, 0],
+        [5, 8, 2], [5, 9, 0], [5, 10, 4], [5, 11, 1], [5, 12, 5], [5, 13, 10], [5, 14, 5], [5, 15, 7], [5, 16, 11],
+        [5, 17, 6], [5, 18, 0], [5, 19, 5], [5, 20, 3], [5, 21, 4], [5, 22, 2], [5, 23, 0], [6, 0, 1], [6, 1, 0],
+        [6, 2, 0], [6, 3, 0], [6, 4, 0], [6, 5, 0], [6, 6, 0], [6, 7, 0], [6, 8, 0], [6, 9, 0], [6, 10, 1],
+        [6, 11, 0], [6, 12, 2], [6, 13, 1], [6, 14, 3], [6, 15, 4], [6, 16, 0], [6, 17, 0], [6, 18, 0], [6, 19, 0],
+        [6, 20, 1], [6, 21, 2], [6, 22, 2], [6, 23, 6]]
+range_color = ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf',
+               '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+bar3d.add("", x_axis, y_aixs, [[d[1], d[0], d[2]] for d in data], is_visualmap=True,
+          visual_range=[0, 20], visual_range_color=range_color, grid3D_width=200, grid3D_depth=80)
+bar3d.show_config()
+bar3d.render()
+```
+![bar3D-0](https://github.com/chenjiandongx/pyecharts/blob/master/images/bar3D-0.gif)
+
+``` grid3D_shading``` could make bar look more real  
+```python
+bar3d = Bar3D("3D 柱状图示例", width=1200, height=600)
+bar3d.add("", x_axis, y_aixs, [[d[1], d[0], d[2]] for d in data], is_visualmap=True,
+          visual_range=[0, 20], visual_range_color=range_color, grid3D_width=200, grid3D_depth=80,
+          grid3D_shading='lambert')
+bar3d.show_config()
+bar3d.render()
+```
+![bar3D-1](https://github.com/chenjiandongx/pyecharts/blob/master/images/bar3D-1.gif)
+
+```is_grid3D_rotate``` could let it rotate automatically
+```python
+bar3d = Bar3D("3D 柱状图示例", width=1200, height=600)
+bar3d.add("", x_axis, y_aixs, [[d[1], d[0], d[2]] for d in data], is_visualmap=True,
+          visual_range=[0, 20], visual_range_color=range_color, grid3D_width=200, grid3D_depth=80,
+          is_grid3D_rotate=True)
+bar3d.show_config()
+bar3d.render()
+```
+![bar3D-2](https://github.com/chenjiandongx/pyecharts/blob/master/images/bar3D-2.gif)
+
+set ``` grid3D_rotate_speed``` to adjust the rotation speed  
+```python
+bar3d = Bar3D("3D 柱状图示例", width=1200, height=600)
+bar3d.add("", x_axis, y_aixs, [[d[1], d[0], d[2]] for d in data], is_visualmap=True,
+          visual_range=[0, 20], visual_range_color=range_color, grid3D_width=200, grid3D_depth=80,
+          is_grid3D_rotate=True, grid3D_rotate_speed=180)
+bar3d.show_config()
+bar3d.render()
+```
+![bar3D-3](https://github.com/chenjiandongx/pyecharts/blob/master/images/bar3D-3.gif)
+
+**Tip：** more details aboutt gird3D，please refer to [Global-options](https://github.com/chenjiandongx/pyecharts/blob/master/document/doc_en_US.md#Global-options)
+
 
 ## EffectScatter
 > The scatter graph with ripple animation. The special animation effect can visually highlights some data.
@@ -361,16 +568,15 @@ EffectScatter.add() signatures
 add(name, x_value, y_value, symbol_size=10, **kwargs)
 ```
 * name -> str  
-    Series name used for displaying in tooltip and filtering with legend,  
-    or updaing data and configuration with setOption.  
+    Series name used for displaying in tooltip and filtering with legend,or updaing data and configuration with setOption.
 * x_axis -> list  
     data of xAxis
 * y_axis -> list  
-    data of yAxis
+    data of yAxis  
 * symbol_size -> int  
     default -> 10  
     symbol size
-    
+
 ```python
 from pyecharts import EffectScatter
 
@@ -396,7 +602,7 @@ es.render()
 
 * symbol -> str  
     symbol shape, it can be 'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'
-* effect_brushtype -> str  
+* effect_brushtype -> str   
     default -> 'stroke'  
     The brush type for ripples. options: 'stroke' and 'fill'.
 * effect_scale -> float  
@@ -449,16 +655,15 @@ add(name, attr, value, scale_range=None, angle_range=None, **kwargs)
     Series name used for displaying in tooltip and filtering with legend,or updaing data and configuration with setOption.
 * attr -> list  
     name of attribute
-* value -> list
+* value -> list  
     value of attribute
 * scale_range -> list  
     default -> [0, 100]  
     data range of guage
 * angle_range -> list  
-    default -> [225, -45]
-    angle range of guage.The direct right side of circle center is 0 degree,  
-    the right above it is 90 degree, the direct left side of it is 180 degree.  
-    
+    default -> [225, -45]  
+    angle range of guage.The direct right side of circle center is 0 degree,the right above it is 90 degree, the direct left side of it is 180 degree.
+
 ```python
 from pyecharts import Gauge
 
@@ -490,10 +695,10 @@ add(name, attr, value, type="scatter", maptype='china', symbol_size=12, border_c
     Series name used for displaying in tooltip and filtering with legend,or updaing data and configuration with setOption.
 * attr -> list  
     name of attribute
-* value -> list   
+* value -> list  
     value of attribute
 * type -> str  
-    default -> 'scatter'
+    default -> 'scatter'  
     chart type, it can be 'scatter', 'effectscatter', 'heatmap'
 * maptype -> str  
     type of map, it only supports 'china' temporarily.
@@ -510,7 +715,7 @@ add(name, attr, value, type="scatter", maptype='china', symbol_size=12, border_c
     default -> '#2a333d'  
     The color of the map area in emphasis state
 
-Scatter 类型
+Scatter type
 ```python
 from pyecharts import Geo
 
@@ -559,7 +764,7 @@ geo.render()
 
 visualMap：visualMap is a type of component for visual encoding, which maps the data to visual channels
 * is_visualmap -> bool  
-    It specifies whether to use the datazoom component.  
+    It specifies whether to use the datazoom component.
 * visual_range -> list  
     default -> [0, 100]  
     pecify the min and max dataValue for the visualMap component.
@@ -570,23 +775,23 @@ visualMap：visualMap is a type of component for visual encoding, which maps the
 * visual_range_color -> list  
     default ->  ['#50a3ba', '#eac763', '#d94e5d']  
     For visual channel color, array is used, like: ['#333', '#78ab23', 'blue'],which means a color ribbon is formed based on the three color stops,and dataValues will be mapped to the ribbon.  
-    Specifically,the dataValue that equals to visualMap.min will be mapped onto '#333',the dataValue that equals to visualMap.max will be mapped onto 'blue',and other dataValues will be piecewisely interpolated to get the final color.  
+    Specifically,the dataValue that equals to visualMap.min will be mapped onto '#333',the dataValue that equals to visualMap.max will be mapped onto 'blue',and other dataValues will be piecewisely interpolated to get the final color.
 * visual_orient -> str  
     default -> 'vertical'  
     How to layout the visualMap component, 'horizontal' or 'vertical'.
 * visual_pos -> str/int  
-    default -> 'left'
+    default -> 'left'  
     Distance between visualMap component and the left side of the container.  
-    visual_pos value can be instant pixel value like 20;it can also be percentage value relative to container width like '20%';and it can also be 'left', 'center', or 'right'.  
+    visual_pos value can be instant pixel value like 20;it can also be percentage value relative to container width like '20%';and it can also be 'left', 'center', or 'right'.
 * visual_top -> str/int  
     default -> 'top'  
     Distance between visualMap component and the top side of the container.  
-    visual_top value can be instant pixel value like 20;it can also be percentage value relative to container width like '20%';and it can also be 'top', 'middle', or 'bottom'.  
+    visual_top value can be instant pixel value like 20;it can also be percentage value relative to container width like '20%';and it can also be 'top', 'middle', or 'bottom'.
 * is_calculable -> bool  
     default -> True  
     Whether show handles, which can be dragged to adjust "selected range".
 
-HeatMap 类型
+HeatMap type
 ```python
 geo = Geo("全国主要城市空气质量", "data from pm2.5", title_color="#fff", title_pos="center", width=1200, height=600,
           background_color='#404a59')
@@ -597,7 +802,7 @@ geo.render()
 ```
 ![geo-0-1](https://github.com/chenjiandongx/pyecharts/blob/master/images/geo-0-1.gif)
 
-EffectScatter 类型
+EffectScatter type
 ```python
 from pyecharts import Geo
 
@@ -623,7 +828,7 @@ add(name, nodes, links, categories=None, is_focusnode=True, is_roam=True, is_rot
 * name -> str  
     Series name used for displaying in tooltip and filtering with legend,or updaing data and configuration with setOption.
 * nodes -> dict  
-    Relational nodes data  
+    Relational nodes data
     * name：Name of data item.     # required！！
     * x：x value of node position.
     * y：y value of node position.
@@ -632,7 +837,7 @@ add(name, nodes, links, categories=None, is_focusnode=True, is_roam=True, is_rot
     * symbol：Symbol of node of this category.Includes 'circle', 'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'
     * symbolSize：symbol size
 * links -> dict  
-    Relational data between nodes  
+    Relational data between nodes
     * source：name of source node on edge      # required！！
     * target：name of target node on edge      # required！！
     * vaule：value of edge,It can be used in the force layout to map to the length of the edge
@@ -644,13 +849,12 @@ add(name, nodes, links, categories=None, is_focusnode=True, is_roam=True, is_rot
 * is_roam -> bool/str  
     default -> True  
     Whether to enable mouse zooming and translating.  
-    If either zooming or translating is wanted,  
-    it can be set to 'scale' or 'move'. Otherwise, set it to be true to enable both.
+    If either zooming or translating is wanted,it can be set to 'scale' or 'move'. Otherwise, set it to be true to enable both.
 * is_rotatelabel -> bool  
     default -> False  
     Whether to rotate the label automatically.
 * layout -> str  
-    Graph layout.
+    Graph layout.  
     default -> 'force'  
     * none：No any layout, use x, y provided in node as the position of node.
     * circular：Adopt circular layout, see the example Les Miserables.
@@ -658,17 +862,15 @@ add(name, nodes, links, categories=None, is_focusnode=True, is_roam=True, is_rot
 * edge_length -> int  
     default -> 50  
     The distance between 2 nodes on edge. This distance is also affected by repulsion.  
-    It can be an array to represent the range of edge length.In this case edge with  
-    larger value will be shorter, which means two nodes are closer. And edge with smaller value will be longer.
+    It can be an array to represent the range of edge length.In this case edge with larger value will be shorter, which means two nodes are closer. And edge with smaller value will be longer.
 * gravity -> int/float  
     default -> 0.2  
-    The gravity factor enforcing nodes approach to the center.  
-    The nodes will be closer to the center as the value becomes larger.
+    The gravity factor enforcing nodes approach to the center.The nodes will be closer to the center as the value becomes larger.
 * repulsion -> int  
     default -> 50  
-    The repulsion factor between nodes. The repulsion will be stronger and the distance between 2 nodes becomes further as this value becomes larger.  
+    The repulsion factor between nodes. The repulsion will be stronger and the distance between 2 nodes becomes further as this value becomes larger.
     It can be an array to represent the range of repulsion.  
-    In this case larger value have larger repulsion and smaller value will have smaller repulsion.  
+    In this case larger value have larger repulsion and smaller value will have smaller repulsion.
 
 ```python
 from pyecharts import Graph
@@ -716,7 +918,7 @@ graph.render()
 ```
 ![graph-2](https://github.com/chenjiandongx/pyecharts/blob/master/images/graph-2.gif)
 
-**Tip：** 可配置 **lineStyle** 参数
+**Tip：** **lineStyle** parameter is configurable
 
 
 # HeatMap
@@ -733,7 +935,7 @@ add(name, x_axis, y_axis, data, **kwargs)
     data of xAxis, it must be catagory axis.
 * y_axis -> str  
     data of yAxis, it must be catagory axis.
-* data -> [[],[]]    
+* data -> [[],[]]  
     data array of series, it is represented by a two-dimension array
 ```python
 import random
@@ -751,7 +953,7 @@ heatmap.render()
 ```
 ![heatmap-0](https://github.com/chenjiandongx/pyecharts/blob/master/images/heatmap-0.gif)
 
-**Tip：** 热力图必须配合 VisualMap 使用才有效果。
+**Tip：** Thermodynamic chart have to cooperate with VisualMap in use.
 
 
 ## Kline
@@ -765,7 +967,7 @@ add(name, x_axis, y_axis, **kwargs)
     Series name used for displaying in tooltip and filtering with legend,or updaing data and configuration with setOption.
 * x_axis -> list  
     data of xAxis
-* y_axis -> [[], []]   
+* y_axis -> [[], []]  
     data pf yAxis.Data should be the two-dimensional array shown as follow.  
     Every data item (each line in the example above) represents a box, which contains 4 values. They are: [open, close, lowest, highest]  (namely: [opening value, closing value, lowest value, highest value])
 ```python
@@ -822,8 +1024,8 @@ add(name, x_axis, y_axis, is_symbol_show=True, is_smooth=False, is_stack=False,
 * is_symbol_show -> bool  
     default -> True  
     It specifies whether to show the symbol.
-* is_smooth -> bool  
-    default -> False  
+* is_smooth -> bool
+    default -> False
     Whether to show as smooth curve.
 * is_stack -> bool  
     default -> Flase  
@@ -849,12 +1051,12 @@ line.render()
 ```
 ![line-0](https://github.com/chenjiandongx/pyecharts/blob/master/images/line-0.gif)
 
-* mark_point  -> list  
+* mark_point -> list  
     mark point data, it can be 'min', 'max', 'average'
 * mark_line  -> list  
     mark line data, it can be 'min', 'max', 'average'
 * mark_point_symbol -> str  
-    default -> pin  
+    default -> 'pin'  
     mark symbol, it cna be 'circle', 'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'
 * mark_point_symbolsize -> int  
     default -> 50  
@@ -863,7 +1065,7 @@ line.render()
     default -> '#fff'  
     mark point text color
 
-标记点其他配置
+Other Configurations Of Marker Point
 ```python
 line = Line("折线图示例")
 line.add("商家A", attr, v1, mark_point=["average", "max", "min"],
@@ -906,9 +1108,66 @@ line.render()
 * area_color -> str  
     Fill color.
 
-**Tip：** 可配置 **lineStyle** 参数
-**Tip：** 可以通过 label_color 来设置线条颜色，如 ['#eee', '#000']，所有的图表类型的图例颜色都可通过 label_color 来修改。
+**Tip：** **lineStyle** Parameter is Configurable
+**Tip：** Setting line colour by label_color,like ['#eee', '#000'],all type of chart can revise label colour by label_color.
 
+
+# Line3D
+Line3D.add() signatures
+```python
+add(name, data, grid3D_opacity=1, **kwargs)
+```
+* name -> str
+    Series name used for displaying in tooltip and filtering with legend,or updaing data and configuration with setOption.
+* data -> [[], []]  
+    data of line3D
+* grid3D_opacity -> float  
+    default -> 1  
+    opacity of gird3D item
+
+draw a spring
+```python
+from pyecharts import Line3D
+
+import math
+_data = []
+for t in range(0, 25000):
+    _t = t / 1000
+    x = (1 + 0.25 * math.cos(75 * _t)) * math.cos(_t)
+    y = (1 + 0.25 * math.cos(75 * _t)) * math.sin(_t)
+    z = _t + 2.0 * math.sin(75 * _t)
+    _data.append([x, y, z])
+range_color = ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf',
+               '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+line3d = Line3D("3D 折线图示例", width=1200, height=600)
+line3d.add("", _data, is_visualmap=True, visual_range_color=range_color, visual_range=[0, 30],
+           grid3D_rotate_sensitivity=5)
+line3d.render()
+```
+![line3D-0](https://github.com/chenjiandongx/pyecharts/blob/master/images/line3D-0.gif)
+
+rotating spring
+```python
+from pyecharts import Line3D
+
+import math
+_data = []
+for t in range(0, 25000):
+    _t = t / 1000
+    x = (1 + 0.25 * math.cos(75 * _t)) * math.cos(_t)
+    y = (1 + 0.25 * math.cos(75 * _t)) * math.sin(_t)
+    z = _t + 2.0 * math.sin(75 * _t)
+    _data.append([x, y, z])
+range_color = ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf',
+               '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+line3d = Line3D("3D 折线图示例", width=1200, height=600)
+line3d.add("", _data, is_visualmap=True, visual_range_color=range_color, visual_range=[0, 30],
+           is_grid3D_rotate=True, grid3D_rotate_speed=180)
+line3d.render()
+```
+![line3D-1](https://github.com/chenjiandongx/pyecharts/blob/master/images/line3D-1.gif)
+
+**Tip：** more details aboutt gird3D，please refer to [Global-options](https://github.com/chenjiandongx/pyecharts/blob/master/document/doc_en_US.md#Global-options)
 
 ## Liquid
 > Liquid chart is usually used to represent data in percentage.
@@ -979,8 +1238,7 @@ add(name, attr, value, is_roam=True, maptype='china', **kwargs)
     value of attribute
 * is_roam -> bool/str  
     default -> True  
-    Whether to enable mouse zooming and translating.  
-    If either zooming or translating is wanted,it can be set to 'scale' or 'move'. Otherwise, set it to be true to enable both.
+    Whether to enable mouse zooming and translating.If either zooming or translating is wanted,it can be set to 'scale' or 'move'. Otherwise, set it to be true to enable both.
 * maptype -> str  
    type of map, it supports china、world、安徽、澳门、北京、重庆、福建、福建、甘肃、广东，广西、广州、海南、河北、黑龙江、河南、湖北、湖南、江苏、江西、吉林、辽宁、内蒙古、宁夏、青海、山东、上海、陕西、四川、台湾、天津、香港、新疆、西藏、云南、浙江
 
@@ -1008,7 +1266,7 @@ map.render()
 ```
 ![map-1](https://github.com/chenjiandongx/pyecharts/blob/master/images/map-1.gif)
 
-**Tip：** 可结合 visualMap 组件进行设置
+**Tip：** Settings can combine with visualMap component.
 
 ```python
 from pyecharts import Map
@@ -1022,14 +1280,14 @@ map.render()
 ```
 ![map-2](https://github.com/chenjiandongx/pyecharts/blob/master/images/map-2.gif)
 
-### 关于自定义地图
-因为地图涉及范围太广，项目不可能涵盖所有的地图，不过不用担心。Echarts 官方提供了自己定制地图的功能 [echart-map](http://echarts.baidu.com/download-map.html)，根据自己所需制定相应的地图，下载成 JS 文件格式。
+### About Customized Map
+Because map contain large area,this program can't cover all the map,but don't worry about it.Echarts officially provide your own custom map [echart-map](http://echarts.baidu.com/download-map.html),this function allow you make map that you need,just download in JS file form.
 
-打开安装目录下的 pyecharts/temple.py 文件，在 _temple 变量下对应的增加类似一行  
- ```<script type="text/javascript " src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/china.js"></script>```  
-而对应的 Jupyter Notebook 下的就在 _mapindex 变量下新增类似一行  
-```"北京": "beijing: '//oog4yfyu0.bkt.clouddn.com/beijing'"```   
-然后就可以在项目中使用自定义的地图了！Js 的引入方式由自己决定，能被项目所找到就行！
+open file pyecharts/temple.py under the installation directory,add the same line under the corresponding of  _temple variable.
+ ```<script type="text/javascript " src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/china.js"></script>```
+correspond under Jupyter Notebook add the same lineunder _mapindex variable.
+```"北京": "beijing: '//oog4yfyu0.bkt.clouddn.com/beijing'"```
+Then use customized map in the program!The way import Js decide by yourself，only if it can be found by the program!
 
 
 ## Parallel
@@ -1039,9 +1297,9 @@ Parallel.add() signatures
 ```python
 add(name, data, **kwargs)
 ```
-* name -> str
+* name -> str  
     Series name used for displaying in tooltip and filtering with legend,or updaing data and configuration with setOption.
-* data -> [[],[]]
+* data -> [[],[]]  
     data array of series, it is represented by a two-dimension array.
 
 Parallel.config() signatures
@@ -1050,16 +1308,16 @@ config(schema=None, c_schema=None)
 ```
 * schema  
     Dimension index of coordinate axis.  
-    a axis name list, like ['apple', 'orange', 'watermelon']  
+    a axis name list, like ['apple', 'orange', 'watermelon']
 * c_schema  
     User customize coordinate axis for parallel coordinate.
-    * dim -> int   
+    * dim -> int  
         Dimension index of coordinate axis.
     * name > str  
         Name of axis.
-    * type -> str   
-        Type of axis
-        value：Numerical axis, suitable for continuous data. 
+    * type -> str  
+        Type of axis  
+        value：Numerical axis, suitable for continuous data.  
         category：Category axis, suitable for discrete category data.Data should only be set via data for this type.
     * min -> int  
         The minimun value of axis.
@@ -1089,7 +1347,7 @@ data = [
         [11, 117, 81, 124, 1.03, 45]
 ]
 parallel = Parallel("平行坐标系-默认指示器")
-parallel.config(schema) 
+parallel.config(schema)
 parallel.add("parallel", data, is_random=True)
 parallel.show_config()
 parallel.render()
@@ -1134,17 +1392,17 @@ parallel.render()
 ```
 ![parallel-1](https://github.com/chenjiandongx/pyecharts/blob/master/images/parallel-1.png)
 
-**Tip：** 可配置 **lineStyle** 参数
+**Tip：** **lineStyle** Parameter is Configurable
 
 
 ## Pie
 > The pie chart is mainly used for showing proportion of different categories.Each arc length represents the proportion of data quantity.
 
-Pie.add() signatures  
+Pie.add() signatures
 ```python
 add(name, attr, value, radius=None, center=None, rosetype=None, **kwargs)
 ```
-* name -> str   
+* name -> str  
     Series name used for displaying in tooltip and filtering with legend,or updaing data and configuration with setOption.
 * attr -> list  
     name of attribute
@@ -1154,7 +1412,7 @@ add(name, attr, value, radius=None, center=None, rosetype=None, **kwargs)
     default -> [0, 75]  
     Radius of Pie chart, the first of which is inner radius, and the second is outer radius.  
     Percentage is supported. When set in percentage,it's relative to the smaller size between height and width of the container.
-* center -> list  
+* center -> list
     default -> [50, 50]  
     Center position of Pie chart, the first of which is the horizontal position,and the second is the vertical position.  
     Percentage is supported. When set in percentage, the item is relative to the container width,and the second item to the height.
@@ -1199,7 +1457,7 @@ pie = Pie("饼图-玫瑰图示例", title_pos='center', width=900)
 pie.add("商品A", attr, v1, center=[25, 50], is_random=True, radius=[30, 75], rosetype='radius')
 pie.add("商品B", attr, v2, center=[75, 50], is_random=True, radius=[30, 75], rosetype='area',
         is_legend_show=False, is_label_show=True)
-pie.show_config() 
+pie.show_config()
 pie.render()
 ```
 ![pie-2](https://github.com/chenjiandongx/pyecharts/blob/master/images/pie-2.png)
@@ -1208,7 +1466,7 @@ pie.render()
 ## Polar
 > Polar coordinate can be used in scatter and line chart. Every polar coordinate has an angleAxis and a radiusAxis.
 
-Polar.add() signatures  
+Polar.add() signatures
 ```python
 add(name, data, angle_data=None, radius_data=None, type='line', symbol_size=4, start_angle=90,
     rotate_step=0, boundary_gap=True, clockwise=True, **kwargs)
@@ -1231,8 +1489,8 @@ add(name, data, angle_data=None, radius_data=None, type='line', symbol_size=4, s
     default -> 90  
     Starting angle of axis.standing for top position of center.0 degree stands for right position of center.
 * rotate_step -> int  
-    default -> 0
-    Rotation degree of axis label, which is especially useful when there is no enough space for category axis.  
+    default -> 0  
+    Rotation degree of axis label, which is especially useful when there is no enough space for category axis.
     Rotation degree is from -90 to 90.
 * boundary_gap -> bool  
     default -> True  
@@ -1246,7 +1504,7 @@ add(name, data, angle_data=None, radius_data=None, type='line', symbol_size=4, s
 * is_stack -> bool  
     It specifies whether to stack category axis.
 * axis_range -> list  
-    default -> [None, None]
+    default -> [None, None]  
     axis scale range
 * is_angleaxis_show -> bool  
     default -> True  
@@ -1279,7 +1537,7 @@ polar.render()
 * area_color -> str  
     Fill color.
 
-**Tip：** 可配置 **lineStyle** 参数
+**Tip：** **lineStyle** Parameter is Configurable
 
 ```python
 from pyecharts import Polar
@@ -1352,7 +1610,7 @@ Radar.config() signatures
 ```python
 config(schema=None, c_schema=None, shape="", rader_text_color="#000", **kwargs):
 ```
-* schema -> list  
+* schema -> list
     The default radar map indicator, used to specify multiple dimensions in the radar map,will process the data into a dictionary of {name: xx, value: xx}
 * c_schema -> dict  
     Indicator of radar chart, which is used to assign multiple variables(dimensions) in radar chart.
@@ -1368,7 +1626,7 @@ config(schema=None, c_schema=None, shape="", rader_text_color="#000", **kwargs):
 ```python
 from pyecharts import Radar
 
-schema = [ 
+schema = [
     ("销售", 6500), ("管理", 16000), ("信息技术", 30000), ("客服", 38000), ("研发", 52000), ("市场", 25000)]
 v1 = [[4300, 10000, 28000, 35000, 50000, 19000]]
 v2 = [[5000, 14000, 28000, 31000, 42000, 21000]]
@@ -1388,13 +1646,13 @@ radar.render()
 * area_color -> str  
     Fill color.
 * is_splitline_show  -> bool  
-    default -> True  
+    default -> True
     It specifies whether to show split line.
 * is_axisline_show -> bool  
     default -> True  
     It specifies whether to show axis line.
 
-**Tip：** 可配置 **lineStyle** 参数
+**Tip：** **lineStyle** Parameter is Configurable
 
 ```python
 value_bj = [
@@ -1446,7 +1704,7 @@ radar.render()
 ```
 ![radar-1](https://github.com/chenjiandongx/pyecharts/blob/master/images/radar-1.gif)
 
-**Tip：** symblo=None 可隐藏标记图形（小圆圈）
+**Tip：** symblo=None make marked graphic hiden(small circle)
 
 
 ## Scatter
@@ -1480,20 +1738,19 @@ scatter.render()
 ```
 ![scatter-0](https://github.com/chenjiandongx/pyecharts/blob/master/images/scatter-0.png)
 
-Scatter 还内置了画画方法
+Scatter also built-in draw method.
 ```python
 draw(path, color=None)
-''' 
-将图片上的像素点转换为数组，如 color 为（255,255,255）时只保留非白色像素点的坐标信息  
-返回两个 k_lst, v_lst 两个列表刚好作为散点图的数据项
-'''
+```
+convert pixels on the image into array ,when colour is （255,255,255）only retain non white pixels' coordinate information. output two k_lst, v_lst list can just as the data item of scatter plot.
+
 ```
 * path -> str  
     path of Image that want to draw
 * color -> str  
     select a color to exclude, (225, 225, 225) means Keep only white pixel information.
 
-首先你需要准备一张图片，如
+First of all ,you need to prepare a picture,like
 
 ![pyecharts-0](https://github.com/chenjiandongx/pyecharts/blob/master/images/pyecharts-0.png)
 
@@ -1508,6 +1765,34 @@ scatter.render()
 ```
 ![pyecharts-1](https://github.com/chenjiandongx/pyecharts/blob/master/images/pyecharts-1.png)
 
+
+# Scatter3D
+Scatter3D.add() signatures
+```python
+add(name, data, grid3D_opacity=1, **kwargs)
+```
+* name -> str
+    Series name used for displaying in tooltip and filtering with legend,or updaing data and configuration with setOption.
+* data -> [[], []]  
+    data of line3D
+* grid3D_opacity -> float  
+    default -> 1  
+    opacity of gird3D item
+
+```python
+from pyecharts import Scatter3D
+
+import random
+data = [[random.randint(0, 100), random.randint(0, 100), random.randint(0, 100)] for _ in range(80)]
+range_color = ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf',
+               '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+scatter3D = Scatter3D("3D 散点图示例", width=1200, height=600)
+scatter3D.add("", data, is_visualmap=True, visual_range_color=range_color)
+scatter3D.render()
+```
+![scatter3D-0](https://github.com/chenjiandongx/pyecharts/blob/master/images/scatter3D-0.gif)
+
+**Tip：** more details aboutt gird3D，please refer to [Global-options](https://github.com/chenjiandongx/pyecharts/blob/master/document/doc_en_US.md#Global-options)
 
 ## WordCloud
 WordCloud.add() signatures
@@ -1556,27 +1841,27 @@ wordcloud.render()
 ```
 ![wordcloud-1](https://github.com/chenjiandongx/pyecharts/blob/master/images/wordcloud-1.png)
 
-**Tip：** 当且仅当 shape 为默认的'circle'时 rotate_step 参数才生效
+**Tip：** if and only if shape is default'circle' the rotate_step parameter will take effect.
 
 
-# 用户自定义
+# User Custom
 
-## 结合不同类型图表画在一张图上
-用户可以自定义结合 Line/Bar/Kline, Scatter/EffectScatter 图表，将不同类型图表画在一张图上。利用第一个图表为基础，往后的数据都将会画在第一个图表上。   
-需使用 ```get_series()``` 和 ```custom()``` 方法  
+## Combination different types of chart and draw they on same picture.
+User Can Combination Custom Line/Bar/Kline, Scatter/EffectScatter chart,draw different types of chart on one image.Using the first chart as basement,data after that will draw on the first chart.
+Need use the method ```get_series()``` and ```custom()```.
 
 ```python
 get_series()
-""" 获取图表的 series 数据 """
+""" Get chart's series data """
 ```
 ```python
 custom(series)
-''' 追加自定义图表类型 '''
+''' Add to custom chart type '''
 ```
-* series -> dict  
-    追加图表类型的 series 数据
+* series -> dict
+    add to chart type series data
 
-先用 ```get_series()``` 获取数据，再使用 ```custom()``` 将图表结合在一起  
+irst use ```get_series()``` to get the data,then use ```custom()``` combine the charts together
 
 Line + Bar
 ```python
@@ -1596,12 +1881,12 @@ bar.render()
 ```
 ![custom-0](https://github.com/chenjiandongx/pyecharts/blob/master/images/custom-0.gif)
 
-具体流程如下：
-1. 初始化图表，正常添加配置项。
-2. 调用第一个图表的 custom(type.get_series()) 方法逐个添加。
-3. 调用第一个图表的 render() 方法。
+Specific procedure are as follows:
+1. initialize the chart,add normal configuration item.
+2. call the first chart's custom(type.get_series()) method and one by one.
+3. call the first chart's render() method.
 
-**Tip：** ```bar.custom(line.get_series())``` 这个一定要注意，利用第一个图表为基础。切记不要写成 ```bar.custom(bar.get_series())``` 不然会进入无限地自我调用的状态中，无限递归，最后可能导致死机。
+**Tip：** ```bar.custom(line.get_series())``` this one have to be careful,use the first one chart as basement.remember do not write ```bar.custom(bar.get_series())``` or the program will get into endless self call state,infinite recursion,finally may cause your computer to crash.
 
 Scatter + EffectScatter
 ```python
@@ -1659,13 +1944,13 @@ kline.render()
 ```
 ![custom-2](https://github.com/chenjiandongx/pyecharts/blob/master/images/custom-2.png)
 
-## 结合不同类型图表画在多张图上，并行显示图表
-用户可以自定义结合 Line/Bar/Kline/Scatter/EffectScatter/Pie/HeatMap 图表，将不同类型图表画在多张图上。同样也是要以某一张图表为基础。     
-需使用 ```get_series()``` 和 ```grid()``` 方法  
+## Combination different types of chart and draw on multiple picture,the chart parallel disply.
+User Can Combination Custom  Line/Bar/Kline/Scatter/EffectScatter/Pie/HeatMap chart,draw different types of chart on multiple image.Using the first chart as basement
+Need use the method ```get_series()``` and ```grid()```.
 
 ```python
 get_series()
-""" 获取图表的 series 数据 """
+""" get chart's series data """
 ```
 ```python
 grid(series，grid_width, grid_height, grid_top, grid_bottom, grid_left, grid_right)
@@ -1679,24 +1964,22 @@ grid(series，grid_width, grid_height, grid_top, grid_bottom, grid_left, grid_ri
     Height of grid component. Adaptive by default.
 * grid_top -> str/int  
     Distance between grid component and the top side of the container.  
-    grid_top value can be instant pixel value like 20;  
-    it can also be percentage value relative to container width like '20%';and it can also be 'top', 'middle', or 'bottom'.  
+    grid_top value can be instant pixel value like 20;it can also be percentage value relative to container width like '20%';and it can also be 'top', 'middle', or 'bottom'.  
     If the grid_top value is set to be 'top', 'middle', or 'bottom',then the component will be aligned automatically based on position.
 * grid_bottom -> str/int  
     Distance between grid component and the bottom side of the container.  
     grid_bottom value can be instant pixel value like 20;it can also be percentage value relative to container width like '20%'.
 * grid_left -> str/int  
     Distance between grid component and the left side of the container.  
-    grid_left value can be instant pixel value like 20;  
-    it can also be percentage value relative to container width like '20%';and it can also be 'left', 'center', or 'right'.  
+    grid_left value can be instant pixel value like 20;it can also be percentage value relative to container width like '20%';and it can also be 'left', 'center', or 'right'.  
     If the grid_left value is set to be 'left', 'center', or 'right',then the component will be aligned automatically based on position.
 * grid_right -> str/int  
     Distance between grid component and the right side of the container.  
     grid_right value can be instant pixel value like 20;it can also be percentage value relative to container width like '20%'.
 
-先用 ```get_series()``` 获取数据，再使用 ```grid()``` 将图表结合在一起  
+irst use ```get_series()``` get data，then use ```grid()``` combine the charts
 
-上下类型，Bar + Line  
+up and down type,Bar + Line
 ```python
 from pyecharts import Bar, Line
 
@@ -1717,16 +2000,16 @@ bar.render()
 ```
 ![grid-0](https://github.com/chenjiandongx/pyecharts/blob/master/images/grid-0.gif)
 
-**再次Tip：** ```bar.grid(line.get_series(), grid_top="60%")``` 不要写成 ```bar.grid(bar.get_series())``` 不然会陷入无限递归中  
+**once more Tip：** ```bar.grid(line.get_series(), grid_top="60%")``` do not write ```bar.grid(bar.get_series())``` or get into edless recursion
 
-具体流程如下：
-1. 在第一个图表初始化的时候制定 is_grid=True，说明要使用 grid 组件。
-2. 第一个表格的 add() 方法中要制定 grid_* 参数，必须制定，因为 grid_* 默认值都是为 None，不会添加到配置项中。最少指定一个。
-3. 初始化其他类型（同类型也可以），不用指定 grid_* 参数。
-4. 调用第一个图表的 grid() 方法逐个添加，并且设置 grid_* 参数，必须指定，至少一个。
-5. 调用第一个图表的 render() 方法。
+The specific process is as follows：
+1. Make is_grid=True when the first chart initialize,declare using grid assembly.
+2. The first form's add() method have to make grid_* parameter，it has to be done,because grid_* default value is None,and won't add to configuration item.Appoint one at least.
+3. Initialize other type（so do the same type）,not need appoint grid_* parameter.
+4. Call the first chart's grid() method and add one by one,and set grid_* parameter，it has to be done，at least one.
+5. Call the first chart's render() method.
 
-左右类型，Scatter + EffectScatter  
+left and right type，Scatter + EffectScatter
 ```python
 from pyecharts import Scatter, EffectScatter
 
@@ -1743,9 +2026,9 @@ scatter.render()
 ```
 ![grid-1](https://github.com/chenjiandongx/pyecharts/blob/master/images/grid-1.gif)
 
-上下左右类型，Bar + Line + Scatter + EffectScatter  
+up,down,left and right type,Bar + Line + Scatter + EffectScatter
 ```python
-from pyecharts import Bar, Line, Scatter, EffectScatter  
+from pyecharts import Bar, Line, Scatter, EffectScatter
 
 attr = ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
 v1 = [5, 20, 36, 10, 75, 90]
@@ -1773,7 +2056,7 @@ bar.render()
 ```
 ![grid-2](https://github.com/chenjiandongx/pyecharts/blob/master/images/grid-2.gif)
 
-Line +  Pie  
+Line +  Pie
 ```python
 from pyecharts import Line, Pie
 
@@ -1829,11 +2112,11 @@ line.render()
 ```
 ![grid-4](https://github.com/chenjiandongx/pyecharts/blob/master/images/grid-4.png)
 
-HeatMap + Bar  
+HeatMap + Bar
 ```python
 import random
 
-from pyecharts import HeatMap, Bar  
+from pyecharts import HeatMap, Bar
 
 x_axis = ["12a", "1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a",
           "12p", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p"]
@@ -1852,17 +2135,17 @@ heatmap.grid(bar.get_series(), grid_top="60%")
 heatmap.show_config()
 heatmap.render()
 ```
-![grid-5](https://github.com/chenjiandongx/pyecharts/blob/master/images/grid-5.gif)  
-Bar 会受 HeatMap 影响，很有趣。
+![grid-5](https://github.com/chenjiandongx/pyecharts/blob/master/images/grid-5.gif)
+Bar will influenced by HeatMap,it's funy.
 
-# 更多示例
+# More Examples
 
-* 更多示例请参考 [example.md](https://github.com/chenjiandongx/pyecharts/blob/master/example.md)
-* 欢迎大家补充示例
+* More examples refer to [example.md](https://github.com/chenjiandongx/pyecharts/blob/master/example.md)
+* Welcome to provide more examples.
 
-# 关于项目
+# About The Project
 
-* 欢迎大家使用 pyecharts
-* 有什么建议或者想法可以开个 issue 讨论，有什么小错误的也可以直接提交 PR。
-* 如有想单独讨论的话可以使用邮箱 -> chenjiandongx@qq.com
-* 关注 [changelog.md](https://github.com/chenjiandongx/pyecharts/blob/master/changelog.md)
+* Enjoy pyecharts!
+* If you have any question or want to improve this repository, welcome to create an issue or pull requests .
+* If you want to discuss with me alone, use the emali -> chenjiandongx@qq.com
+* Show solicitude for [changelog.md](https://github.com/chenjiandongx/pyecharts/blob/master/changelog.md)
